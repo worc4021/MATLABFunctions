@@ -21,18 +21,17 @@ if and(~isempty(A1),~isempty(A2))
     Aineq = sparse(kron(eye(m),b1'));
     bineq = b2;
 
-    model = struct('obj',ones(size(Aeq,2),1),...
+% ------------  Gurobi ----------
+    model = struct('obj',zeros(size(Aeq,2),1),...
                     'A',[Aeq;Aineq],...
                     'rhs',[beq;bineq],...
                     'sense',[char(ones(size(beq))*'=');char(ones(size(bineq))*'<')],...
                     'lb',zeros(size(Aeq,2),1));
-	param = struct('LogToConsole',0,'OutputFlag',0);
+	param = struct('OutputFlag',0);
     
     res = gurobi(model,param);
-
-    retVal = or(strcmp(res.status,'OPTIMAL'),strcmp(res.status,'SUBOPTIMAL'));
     
-    
+    retVal = ~strcmp(res.status,'INFEASIBLE');
     
 else
     retVal = 0;
